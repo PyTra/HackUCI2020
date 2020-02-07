@@ -1,5 +1,8 @@
 import cv2
 
+class GameOverException(Exception):
+  pass
+
 def quickshow(name, frame):
   cv2.imshow(name, frame)
   cv2.waitKey(0)
@@ -176,9 +179,13 @@ movement = {"Blue":
 			}
 }
 
+CLOSE_ENOUGH = .1
+def CLOSE(a, b):
+  return np.isclose(a,b,CLOSE_ENOUGH)
+
 def spriteEquivalent(team: int, position: list, velocity: list, aerial: bool, shooting: bool, orientation: str):
 # BLUEEEEEEEEEEEEEEE
-    #print('TEAM %s POSITION %s VELOCITY %s AERIAL %s SHOOTING %s ORIENTATION %s'%(team, position, velocity, aerial, shooting, orientation ) )
+    ##print('TEAM %s POSITION %s VELOCITY %s AERIAL %s SHOOTING %s ORIENTATION %s'%(team, position, velocity, aerial, shooting, orientation ) )
     shooting = not shooting
     if team == 0:
         if orientation == "left":
@@ -310,22 +317,22 @@ def spriteEquivalent(team: int, position: list, velocity: list, aerial: bool, sh
                 if velocity[0] < 0:
                     return movement["Blue"]["Running"]["Right"],position
     else:
-        ##print('TEAM %s POSITION %s VELOCITY %s AERIAL %s SHOOTING %s ORIENTATION %s'%(team, position, velocity, aerial, shooting, orientation ) )
+        ###print('TEAM %s POSITION %s VELOCITY %s AERIAL %s SHOOTING %s ORIENTATION %s'%(team, position, velocity, aerial, shooting, orientation ) )
         if orientation == "left":
             if shooting:
                 #Idle Left WITH GUN
-                if velocity[0] == 0 and velocity[1] == 0:
+                if CLOSE(velocity[0], 0) and CLOSE(velocity[1], 0):
                     return movement["Red"]["Idle Shooting"]["Left"],position
                 
                 # Walking Left WITH GUN
-                if -15 <= velocity[0] < 0 and velocity[1] == 0:
+                if -15 <= velocity[0] < 0 and CLOSE(velocity[1], 0):
                     if movement["Red"]["Walking Shooting"]["Left"][1] == len(movement["Red"]["Walking Shooting"]["Left"][0]) - 1:
                         movement["Red"]["Walking Shooting"]["Left"][1] = -1
                     movement["Red"]["Walking Shooting"]["Left"][1] += 1
                     return movement["Red"]["Walking Shooting"]["Left"][0][movement["Red"]["Walking Shooting"]["Left"][1]],position
                 
                 # Running Left WITH GUN
-                if -30 <= velocity[0] < -15 and velocity[1] == 0:
+                if -30 <= velocity[0] < -15 and CLOSE(velocity[1], 0):
                     if movement["Red"]["Running Shooting"]["Left"][1] == len(movement["Red"]["Running Shooting"]["Left"][0]) - 1:
                         movement["Red"]["Running Shooting"]["Left"][1] = -1
                     movement["Red"]["Running Shooting"]["Left"][1] += 1
@@ -347,22 +354,22 @@ def spriteEquivalent(team: int, position: list, velocity: list, aerial: bool, sh
             elif not shooting:
                 
                 # Idle Left
-                if velocity[0] == 0 and velocity[1] == 0:
+                if CLOSE(velocity[0], 0) and CLOSE(velocity[1], 0):
                     if movement["Red"]["Standing"]["Left"][1] == len(movement["Red"]["Standing"]["Left"][0]) - 1:
                         movement["Red"]["Standing"]["Left"][1] = -1
                     movement["Red"]["Standing"]["Left"][1] += 1
                     return movement["Red"]["Standing"]["Left"][0][movement["Red"]["Standing"]["Left"][1]],position
                 
                 # Walking Left
-                #print("gets here")
-                if -15 <= velocity[0] < 0 and velocity[1] == 0:
+                ##print("gets here")
+                if -15 <= velocity[0] < 0 and CLOSE(velocity[1], 0):
                     if movement["Red"]["Walking"]["Left"][1] == len(movement["Red"]["Walking"]["Left"][0]) - 1:
                         movement["Red"]["Walking"]["Left"][1] = -1
                     movement["Red"]["Walking"]["Left"][1] += 1
                     return movement["Red"]["Walking"]["Left"][0][movement["Red"]["Walking"]["Left"][1]],position
                 
                 # Running Left
-                if -30 <= velocity[0] < -15 and velocity[1] == 0:
+                if -30 <= velocity[0] < -15 and CLOSE(velocity[1], 0):
                     return movement["Red"]["Running"]["Left"],position
                 
                 # Jumping Left
@@ -379,18 +386,18 @@ def spriteEquivalent(team: int, position: list, velocity: list, aerial: bool, sh
             if shooting:
                 
                 # Idle Right WITH GUN
-                if velocity[0] == 0 and velocity[1] == 0:
+                if CLOSE(velocity[0], 0) and CLOSE(velocity[1], 0):
                     return movement["Red"]["Idle Shooting"]["Right"],position
                 
                 # Walking Right WITH GUN
-                if 0 < velocity[0] < 15 and velocity[1] == 0:
+                if 0 < velocity[0] < 15 and CLOSE(velocity[1], 0):
                     if movement["Red"]["Walking Shooting"]["Right"][1] == len(movement["Red"]["Walking Shooting"]["Right"][0]) - 1:
                         movement["Red"]["Walking Shooting"]["Right"][1] = -1
                     movement["Red"]["Walking Shooting"]["Right"][1] += 1
                     return movement["Red"]["Walking Shooting"]["Right"][0][movement["Red"]["Walking Shooting"]["Right"][1]],position
                 
                 # Running Right WITH GUN
-                if 15 <= velocity[0] <= 30 and velocity[1] == 0:
+                if 15 <= velocity[0] <= 30 and CLOSE(velocity[1], 0):
                     if movement["Red"]["Running Shooting"]["Right"][1] == len(movement["Red"]["Running Shooting"]["Right"][0]) - 1:
                         movement["Red"]["Running Shooting"]["Right"][1] = -1
                     movement["Red"]["Running Shooting"]["Right"][1] += 1
@@ -413,21 +420,21 @@ def spriteEquivalent(team: int, position: list, velocity: list, aerial: bool, sh
             elif not shooting:
                 
                 # Idle Right
-                if velocity[0] == 0 and velocity[1] == 0:
+                if CLOSE(velocity[0], 0) and CLOSE(velocity[1], 0):
                     if movement["Red"]["Standing"]["Right"][1] == len(movement["Red"]["Standing"]["Right"][0]) - 1:
                         movement["Red"]["Standing"]["Right"][1] = -1
                     movement["Red"]["Standing"]["Right"][1] += 1
                     return movement["Red"]["Standing"]["Right"][0][movement["Red"]["Standing"]["Right"][1]],position
                 
                 # Walking Right
-                if 0 < velocity[0] < 15 and velocity[1] == 0:
+                if 0 < velocity[0] < 15 and CLOSE(velocity[1], 0):
                     if movement["Red"]["Walking"]["Right"][1] == len(movement["Red"]["Walking"]["Right"][0]) - 1:
                         movement["Red"]["Walking"]["Right"][1] = -1
                     movement["Red"]["Walking"]["Right"][1] += 1
                     return movement["Red"]["Walking"]["Right"][0][movement["Red"]["Walking"]["Right"][1]],position
                 
                 # Running Right
-                if 15 <= velocity[0] <= 30 and velocity[1] == 0:
+                if 15 <= velocity[0] <= 30 and CLOSE(velocity[1], 0):
                     return movement["Red"]["Running"]["Right"],position
                 
                 # Jumping Right
@@ -444,21 +451,21 @@ def spriteEquivalent(team: int, position: list, velocity: list, aerial: bool, sh
 
 ######################################################################
 TIME_PER_FRAME = .1 #Assuming 10 FPS, doesn't have to be accurate just random estimate for speed weight
-BULLET_WEIGHT = .6  #weight for bullet velocity to be added to persons velocity
+BULLET_WEIGHT = .8  #weight for bullet velocity to be added to persons velocity
 PERSON_SHOOT_COOLDOWN = 60 #30 frames for bullet cooldown
-PERSON_MAX_SPEED = 45
+PERSON_MAX_SPEED = 100
 PERSON_HEIGHT = 70
 PERSON_WIDTH  = 100
 BULLET_RADIUS = 30
-GRAVITY_STRENGTH = 10
+GRAVITY_STRENGTH = 6.5
 SCREEN_WIDTH = pygame.display.Info().current_w
 SCREEN_HEIGHT = pygame.display.Info().current_h
-GAME_OVER_IMAGE = pygame.image.load("game_over.jpg")
-BULLET_KNOCKBACK_VERTICAL = 10
-JUMP_STRENGTH = 10
+GAME_OVER_IMAGE = pygame.image.load("game_over.png")
+BULLET_KNOCKBACK_VERTICAL = 30
+JUMP_STRENGTH = 150
 BULLET_SPEED = 120
-BULLET_LIFETIME = 4
-ACCELERATE_DOWN = 3
+BULLET_LIFETIME = 2
+ACCELERATE_DOWN = 6
 ENERGY_BALL_1 = pygame.image.load("energyball1.png")
 ENERGY_BALL_2 = pygame.image.load("energyball2.png")
 
@@ -490,6 +497,8 @@ def apply_gravity():
   for bullet in INTERACTIONS['Bullet']:
     if bullet.touching_floor():
       bullet.velocity[1] *= -.8
+    else:
+      bullet.velocity[1] += GRAVITY_STRENGTH * .05
 
 class InteractBox:
   def __init__(self, x, y, w, h):
@@ -498,6 +507,7 @@ class InteractBox:
     self.h = h
 
   def contains(self, position):
+    #print('Passed in position is', position)
     if (position[1] < self.topleft[1] + self.h) and (position[1] > self.topleft[1]):
       if (position[0] > self.topleft[0]) and (position[0] < self.topleft[0] + self.w):
         return True
@@ -507,6 +517,9 @@ class InteractCircle:
   def __init__(self, x, y, r):
     self.center = np.array([x,y], dtype = np.float)
     self.r = r
+  
+  def contains(self, position):
+    return np.linalg.norm(position - self.center) <= self.r
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
@@ -520,7 +533,7 @@ class Moveable:
       startingpos = np.array([0,0], dtype = np.float), 
       startingvel = np.array([0,0], dtype = np.float)
       ):
-        #print('Moveable')
+        ##print('Moveable')
         #All vectors are (x, y)
         self.position = np.array(startingpos, dtype = np.float)
         self.velocity = np.array(startingvel, dtype = np.float)
@@ -531,14 +544,24 @@ class Moveable:
         return
 
       while 1:
-        nextpos = self.position + self.velocity * TIME_PER_FRAME
+        nextpos = self.position + (self.velocity * TIME_PER_FRAME)
+
+        if nextpos[0] > SCREEN_WIDTH or nextpos[0] < 0 or nextpos[1] > SCREEN_HEIGHT or nextpos[1] < 0:
+          GAME_OVER = True
+          raise GameOverException('ad')
+          return
+
         for box in INTERACTIONS['Box']:
-          if not box.contains(nextpos):
-            self.position = nextpos
-            return
+          #print('Going through box', box.topleft, box.w, box.h)
+          #print(len(INTERACTIONS['Box']))
+          if box.contains(nextpos) or box.contains(nextpos + [0, PERSON_HEIGHT]) or box.contains( nextpos + [PERSON_WIDTH, 0] ) or box.contains( nextpos + [PERSON_WIDTH, PERSON_HEIGHT] ):
+            self.velocity *= .85
+            break
         else:
-          ##print('MULTING', self.team)
-          self.velocity *= .75
+          #print('CONDITIONS')
+          #print(box.contains(nextpos), box.contains(nextpos + [0, PERSON_HEIGHT]), box.contains( nextpos + [PERSON_WIDTH, 0] ) , box.contains( nextpos + [PERSON_WIDTH, PERSON_HEIGHT] ) )
+          self.position = nextpos
+          return
 
 class Person(Moveable):
     TEAM_NEXT = 0
@@ -595,13 +618,19 @@ class Person(Moveable):
     
     def next_frame(self):
       Moveable.next_frame(self)
+      self.hitbox.topleft = self.position
       for box in INTERACTIONS['Box']:
-        if self.position[1] == box.topleft[1]:
+        if self.position[1] + PERSON_HEIGHT == box.topleft[1]:
             if (self.position[0] < box.topleft[0]+box.w) and (self.position[0] > box.topleft[0]):
                 self.aerial = False
                 return
       else:
         self.aerial = True
+    
+    def take_life(self):
+      self.lives -= 1
+      if self.lives == 0:
+        print('End Game')
 
 class Bullet(Moveable):
     def __init__(self, startingpos, startingvel, team):
@@ -619,13 +648,17 @@ class Bullet(Moveable):
           if (self.position[0] < (box.topleft[0] + box.w)) and (self.position[0] > box.topleft[0]):
             return True
       return False
+    
+    def next_frame(self):
+      Moveable.next_frame(self)
+      self.hitbox.center = self.position
 
 class Box:
     def __init__(self, topleft, w, h):
-        INTERACTIONS['Box'].append(self)
         self.topleft = topleft
         self.w = w
         self.h = h
+        INTERACTIONS['Box'].append(self)
 
     def contains(self, position):
       if (position[1] < self.topleft[1] + self.h) and (position[1] > self.topleft[1]):
@@ -733,134 +766,144 @@ for joystick in joysticks:
 '''
     Main game loop
 '''
-filtered_squarelist = [((cor[0][0] * (SCREEN_WIDTH / 640), cor[0][1] * (SCREEN_HEIGHT / 480)), (cor[1][0] * (SCREEN_WIDTH / 640), cor[1][1] * (SCREEN_HEIGHT / 480))) for cor in filtered_squarelist]
+#filtered_squarelist = [((cor[0][0] * (SCREEN_WIDTH / 640), cor[0][1] * (SCREEN_HEIGHT / 480)), (cor[1][0] * (SCREEN_WIDTH / 640), cor[1][1] * (SCREEN_HEIGHT / 480))) for cor in filtered_squarelist]
+
+filtered_squarelist = list( [ ( (minX * (SCREEN_WIDTH / 640), minY * SCREEN_HEIGHT / 480 ), ( maxX * SCREEN_WIDTH / 640, maxY * SCREEN_HEIGHT / 480 ) ) for ( (minX, minY), (maxX, maxY) ) in filtered_squarelist ] )
 screen.fill([255, 255, 255])
 
 for ( minX, minY ), ( maxX, maxY ) in filtered_squarelist:
   Box( np.array([minX, minY]), maxX-minX, maxY-minY )
-  print('Box made at position ', minX, minY, 'with w and h', maxX - minX, maxY - minY)
+  #print('Box made at position ', minX, minY, 'with w and h', maxX - minX, maxY - minY)
 
 PERSON1 = Person()
 PERSON2 = Person()
 
-GAME_OVER = False
-while not GAME_OVER:
-    screen.fill([255, 255, 255])
-    screen.blit(BackGround.image, BackGround.rect)
+try:
+  GAME_OVER = False
+  while not GAME_OVER:
+      screen.fill([255, 255, 255])
+      screen.blit(BackGround.image, BackGround.rect)
 
-    '''
-        check bullet -> person
-        commands->person
-        check person -> floor
-        check bullet -> floor
-        check person -> person
+      '''
+          check bullet -> person
+          commands->person
+          check person -> floor
+          check bullet -> floor
+          check person -> person
 
-        increment position with step, each step is .1 second (can change)
-    '''
-    for interaction in INTERACTIONS["Person"]:
-      try:
-        img, pos = spriteEquivalent(interaction.team, interaction.position,interaction.velocity, interaction.aerial,interaction.shoot_cooldown, interaction.orientation)
-        img = pygame.transform.scale(img,(PERSON_WIDTH,PERSON_HEIGHT))
-        screen.blit(img, [pos[0], pos[1]])
-      except TypeError:
-        print("aint nobody got time for that")
+          increment position with step, each step is .1 second (can change)
+      '''
+      for interaction in INTERACTIONS["Person"]:
+        try:
+          img, pos = spriteEquivalent(interaction.team, interaction.position,interaction.velocity, interaction.aerial,interaction.shoot_cooldown, interaction.orientation)
+          img = pygame.transform.scale(img,(PERSON_WIDTH,PERSON_HEIGHT))
+          screen.blit(img, [pos[0], pos[1]])
+        except TypeError:
+          print("aint nobody got time for that")
 
-    for interaction in INTERACTIONS["Bullet"]:
-      if interaction.team == 0:
-        screen.blit(pygame.transform.scale(ENERGY_BALL_1, (BULLET_RADIUS * 2, BULLET_RADIUS * 2)), [interaction.position[0] + BULLET_RADIUS, interaction.position[1] + BULLET_RADIUS])
-      else:
-        screen.blit(pygame.transform.scale(ENERGY_BALL_2, (BULLET_RADIUS * 2, BULLET_RADIUS * 2)), [interaction.position[0] + BULLET_RADIUS, interaction.position[1] + BULLET_RADIUS])
-      
-
-
-    bullet_index_arr = np.arange( len(INTERACTIONS['Bullet']) )
-    #print('bullet_index_arr is ', bullet_index_arr)
-    for person in INTERACTIONS['Person']:
-      for bnum in bullet_index_arr:
-        if len(INTERACTIONS['Bullet']) == 0:
-          break
-        #print(bullet_index_arr)
-        #print(bnum)
-        #print(len(INTERACTIONS['Bullet']) )
-        if person.team != INTERACTIONS['Bullet'][bnum].team:
-          if person.hitbox.contains( INTERACTIONS['Bullet'][bnum].position ):
-            person.velocity += INTERACTIONS['Bullet'][bnum].velocity * BULLET_WEIGHT
-            person.velocity[1] -= BULLET_KNOCKBACK_VERTICAL
-            person.aerial = True
-
-            INTERACTIONS['Bullet'].pop(bnum)
-            bullet_index_arr -= 1
-            #print('REMOVED BULLET')
+      for interaction in INTERACTIONS["Bullet"]:
+        if interaction.team == 0:
+          screen.blit(pygame.transform.scale(ENERGY_BALL_1, (BULLET_RADIUS * 2, BULLET_RADIUS * 2)), [interaction.position[0] + BULLET_RADIUS, interaction.position[1] + BULLET_RADIUS])
+        else:
+          screen.blit(pygame.transform.scale(ENERGY_BALL_2, (BULLET_RADIUS * 2, BULLET_RADIUS * 2)), [interaction.position[0] + BULLET_RADIUS, interaction.position[1] + BULLET_RADIUS])
         
-    person1 = INTERACTIONS['Person'][0] #Do Person-Person calculations with Person 0 since only 2 people
-    corners1 = [person1.hitbox.topleft, #topleft
-                person1.hitbox.topleft + [0, person1.hitbox.h], #bottomleft
-                person1.hitbox.topleft + [person1.hitbox.w, person1.hitbox.h], #bottomright
-                person1.hitbox.topleft + [person1.hitbox.w, 0] ] #topright
-    
-    for corner in corners1:
-      if INTERACTIONS['Person'][1].hitbox.contains( corner ):
-        person1 = INTERACTIONS['Person'][0]
-        person2 = INTERACTIONS['Person'][1]
-        total = abs(person1.velocity) + abs(person2.velocity)
-        person1.velocity = total/2
-        person2.velocity = total/2
-        person1.velocity[1] = -5
-        person2.velocity[1] = -5
-        person1.aerial = True
-        person2.aerial = True
-        break
 
-    commands = get_commands(joysticks)
-    #print(commands[0],commands[1])
+      try:
+        bullet_index_arr = np.arange( len(INTERACTIONS['Bullet']) )
+        #print('bullet_index_arr is ', bullet_index_arr)
+        for person in INTERACTIONS['Person']:
+          for bnum in bullet_index_arr:
+            if len(INTERACTIONS['Bullet']) == 0:
+              break
+            #print(bullet_index_arr)
+            #print(bnum)
+            #print(len(INTERACTIONS['Bullet']) )
+            if person.team != INTERACTIONS['Bullet'][bnum].team:
+              if (INTERACTIONS['Bullet'][bnum].hitbox.contains(person.position) or INTERACTIONS['Bullet'][bnum].hitbox.contains(person.position + [0, PERSON_HEIGHT]) or 
+              INTERACTIONS['Bullet'][bnum].hitbox.contains(person.position + [PERSON_WIDTH, 0]) or INTERACTIONS['Bullet'][bnum].hitbox.contains(person.position + [PERSON_WIDTH, PERSON_HEIGHT]) ): #if collide
+                person.velocity += INTERACTIONS['Bullet'][bnum].velocity * BULLET_WEIGHT
+                person.velocity[1] -= BULLET_KNOCKBACK_VERTICAL
+                person.aerial = True
 
+                INTERACTIONS['Bullet'].pop(bnum)
+                bullet_index_arr -= 1
+                #print('REMOVED BULLET')
+      except:
+        pass
 
-    #Putting commands into people, discard commands now
-    for person_number in range(2):
-      for command in commands[person_number]:
-        if command == 'moveleft':
-          INTERACTIONS['Person'][person_number].move('moveleft')
-        elif command == 'moveright':
-          INTERACTIONS['Person'][person_number].move('moveright')
-        elif command == 'jump':
-          INTERACTIONS['Person'][person_number].move('jump')
-        elif command == 'acceleratedown':
-          INTERACTIONS['Person'][person_number].move('acceleratedown')
-        elif command == 'shoot':
-          INTERACTIONS['Person'][person_number].move('shoot')
-      #print('----------------------------------------')
-      #print(INTERACTIONS['Person'][person_number].team, person_number)
-
-    if PERSON1.shoot_cooldown:
-      PERSON1.last_shot -= 1
-      if PERSON1.last_shot == 0:
-        PERSON1.shoot_cooldown = False
-
-    if PERSON2.shoot_cooldown:
-      PERSON2.last_shot -= 1
-      if PERSON2.last_shot == 0:
-        PERSON2.shoot_cooldown = False
-    
-    for person in INTERACTIONS['Person']:
-      person.next_frame()
-    for bullet in INTERACTIONS['Bullet']:
-      bullet.next_frame()
-
-    for square in filtered_squarelist:
-      pygame.draw.rect(screen, 1, pygame.Rect(square[0][0], square[0][1], square[1][0] - square[0][0], square[1][1] - square[0][1]))
+      person1 = INTERACTIONS['Person'][0] #Do Person-Person calculations with Person 0 since only 2 people
+      corners1 = [person1.hitbox.topleft, #topleft
+                  person1.hitbox.topleft + [0, person1.hitbox.h], #bottomleft
+                  person1.hitbox.topleft + [person1.hitbox.w, person1.hitbox.h], #bottomright
+                  person1.hitbox.topleft + [person1.hitbox.w, 0] ] #topright
       
+      for corner in corners1:
+        if INTERACTIONS['Person'][1].hitbox.contains( corner ):
+          person1 = INTERACTIONS['Person'][0]
+          person2 = INTERACTIONS['Person'][1]
+          total = abs(person1.velocity) + abs(person2.velocity)
+          person1.velocity = total/2
+          person2.velocity = total/2
+          person1.velocity[1] = -5
+          person2.velocity[1] = -5
+          person1.aerial = True
+          person2.aerial = True
+          break
 
-    cleanup_dead_bullets()
-    apply_gravity()
-    pygame.display.flip()
+      commands = get_commands(joysticks)
+      #print(commands[0],commands[1])
+
+
+      #Putting commands into people, discard commands now
+      for person_number in range(2):
+        for command in commands[person_number]:
+          if command == 'moveleft':
+            INTERACTIONS['Person'][person_number].move('moveleft')
+          elif command == 'moveright':
+            INTERACTIONS['Person'][person_number].move('moveright')
+          elif command == 'jump':
+            INTERACTIONS['Person'][person_number].move('jump')
+          elif command == 'acceleratedown':
+            INTERACTIONS['Person'][person_number].move('acceleratedown')
+          elif command == 'shoot':
+            INTERACTIONS['Person'][person_number].move('shoot')
+        #print('----------------------------------------')
+        #print(INTERACTIONS['Person'][person_number].team, person_number)
+
+      if PERSON1.shoot_cooldown:
+        PERSON1.last_shot -= 1
+        if PERSON1.last_shot == 0:
+          PERSON1.shoot_cooldown = False
+
+      if PERSON2.shoot_cooldown:
+        PERSON2.last_shot -= 1
+        if PERSON2.last_shot == 0:
+          PERSON2.shoot_cooldown = False
+      
+      for person in INTERACTIONS['Person']:
+        person.next_frame()
+      for bullet in INTERACTIONS['Bullet']:
+        bullet.next_frame()
+
+      for square in filtered_squarelist:
+        pygame.draw.rect(screen, 1, pygame.Rect(square[0][0], square[0][1], square[1][0] - square[0][0], square[1][1] - square[0][1]))
+        
+
+      cleanup_dead_bullets()
+      apply_gravity()
+      pygame.display.flip()
+except GameOverException:
+  pass
 '''
 End Game Loop
 '''
-# while True:
-#     GameOver.render(screen)
-#     commands = get_commands(joysticks)
-#     for player_commands in commands:
-#         for indiv_commands in player_commands:
-#             if indiv_commands == "shoot":
-#                 break
-    
+while True:
+    screen.blit(GAME_OVER_IMAGE,( int(SCREEN_WIDTH / 3), int(SCREEN_HEIGHT / 3) ) )
+    commands = get_commands(joysticks)
+    for player_commands in commands:
+        for indiv_commands in player_commands:
+            if indiv_commands == "shoot":
+                pygame.quit()
+    pygame.display.flip()
+
+cv2.destroyAllWindows()
